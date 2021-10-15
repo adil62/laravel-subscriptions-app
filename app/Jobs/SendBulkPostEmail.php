@@ -35,16 +35,15 @@ class SendBulkPostEmail implements ShouldQueue
      */
     public function handle()
     {
-        $users = User::all();
-
-        $users->each(function ($user) {
+        $post = $this->post->with('website', 'website.users')->first();
+ 
+        $post?->website?->users?->each(function ($user) {
             Mail::send(
-                'mail.post_created',
+                'mail.post',
                 ['post' => $this->post],
                 function ($message) use ($user) {
                     $message
-                        ->to($user->email, $user->name)
-                        ->subject('New Post');
+                        ->to($user->email, $user->name);
                 }
             );
         });
