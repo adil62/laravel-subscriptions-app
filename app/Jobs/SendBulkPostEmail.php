@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Models\User;
+use App\Models\UserSentPost;
 use Illuminate\Bus\Queueable;
 use function GuzzleHttp\Promise\all;
 use Illuminate\Support\Facades\Mail;
@@ -36,16 +37,32 @@ class SendBulkPostEmail implements ShouldQueue
     public function handle()
     {
         $post = $this->post->with('website', 'website.users')->first();
- 
-        $post?->website?->users?->each(function ($user) {
+        $userSentPosts = [];    
+
+        $post?->website?->users?->each(function ($user) use($post) {
+            $postPreviouslySent = UserSentPost::where('post_id', $post->id)->where('user_id', $user->id)->first();
+
+            if ($postPreviouslySent) {
+                return false;
+            }
+
             Mail::send(
                 'mail.post',
-                ['post' => $this->post],
+                ['post' => $post],
                 function ($message) use ($user) {
                     $message
                         ->to($user->email, $user->name);
                 }
             );
+
+            array_push([
+                'user_id' => $user->id,
+                'post_id' => $post->id
+            ]);
         });
+
+        if (count($userSentPosts) > 0) {
+            UserSentPost::create($userSentPosts);
+        }
     }
 }
