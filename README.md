@@ -6,7 +6,8 @@
 - start the dev server : php artisan serve
 - run the queue woker : php artisan queue:work
 - for creating a Post : 
-  ``` POST api/posts 
+  ``` 
+      POST api/posts 
       body : {
           "title" : "post1",
           "description" : "description",
@@ -14,7 +15,8 @@
       }
   ```
 - for subscribing to a website :
-  ``` POST /api/users/subscribe
+  ``` 
+      POST /api/users/subscribe
       body {
         "user_id" : 1,
         "website_id" : 2
