@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Models\Post;
+use App\Events\PostCreated;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Validator;
@@ -30,6 +31,8 @@ class PostController extends Controller
             $post->description = $request->description;
             $post->save();
     
+            PostCreated::dispatch($post);
+            
             return response()->json([
                 'message' => 'Successfully created post',
                 'post' => $post
