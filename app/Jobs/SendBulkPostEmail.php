@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Models\Post;
 use App\Models\User;
 use App\Models\UserSentPost;
 use Illuminate\Bus\Queueable;
@@ -36,7 +37,7 @@ class SendBulkPostEmail implements ShouldQueue
      */
     public function handle()
     {
-        $post = $this->post->with('website', 'website.users')->first();
+        $post = Post::with('website', 'website.users')->where('id', $this->post->id)->first();
         $userSentPosts = [];    
 
         $post?->website?->users?->each(function ($user) use($post, &$userSentPosts) {
