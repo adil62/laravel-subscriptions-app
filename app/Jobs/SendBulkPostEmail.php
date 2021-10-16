@@ -39,7 +39,7 @@ class SendBulkPostEmail implements ShouldQueue
         $post = $this->post->with('website', 'website.users')->first();
         $userSentPosts = [];    
 
-        $post?->website?->users?->each(function ($user) use($post) {
+        $post?->website?->users?->each(function ($user) use($post, &$userSentPosts) {
             $postPreviouslySent = UserSentPost::where('post_id', $post->id)->where('user_id', $user->id)->first();
 
             if ($postPreviouslySent) {
@@ -55,14 +55,15 @@ class SendBulkPostEmail implements ShouldQueue
                 }
             );
 
-            array_push([
+            array_push($userSentPosts, [
                 'user_id' => $user->id,
-                'post_id' => $post->id
+                'post_id' => $post->id,
+                'created_at' => now()
             ]);
         });
 
         if (count($userSentPosts) > 0) {
-            UserSentPost::create($userSentPosts);
+            UserSentPost::insert($userSentPosts);
         }
     }
 }

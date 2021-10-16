@@ -23,8 +23,6 @@ class PostCreated
      */
     public function __construct($post)
     {
-        info('event executed');
-
         $this->post = $post;
     }
 
